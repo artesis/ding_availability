@@ -207,8 +207,8 @@ function ding_availability_ajax($objects, $prefix = null, $settings = array()) {
         continue;
       }
 
-      $ids[] = $id = drupal_html_id($prefix . '-' . $object->id);
-      $data[$id] = array($object->localId);
+      $ids[] = $id = drupal_html_id($prefix . '-' . $object->getLocalId());
+      $data[$id] = array($object->getLocalId());
     }
     $settings = array_merge(array('ding_availability' => $data), $settings);
     drupal_add_js($settings, array('type' => 'setting'));
