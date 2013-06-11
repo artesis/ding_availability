@@ -42,6 +42,7 @@ function ding_availability_ding_provider_user() {
 
 /**
  * Ajax handler method.
+ *
  * Returns JSON with information if item(s) is reserveable.
  */
 function ding_availability_js($provider_ids) {
@@ -49,7 +50,7 @@ function ding_availability_js($provider_ids) {
 }
 
 /**
- *
+ * Ajax handler for holdings.
  */
 function ding_availability_holdings_js($provider_ids) {
   drupal_json_output(ding_availability_holdings(explode(',', $provider_ids)));
@@ -79,7 +80,7 @@ function ding_availability_items($provider_ids) {
 }
 
 /**
- *
+ * Get availability holdings.
  */
 function ding_availability_holdings($provider_ids) {
   $items = ding_provider_invoke('availability', 'holdings', $provider_ids);
@@ -101,7 +102,7 @@ function ding_availability_holdings($provider_ids) {
       // If this type is not marked as available for reservation hide button.
       if ($entity != NULL && !in_array(strtolower($entity->getType()), $reservable_types)) {
         $item['show_reservation_button'] = FALSE;
-       }
+      }
     }
     catch(Exception $e) {
       // Keep 'show_reservation_button' as default from provider  FALSE.
@@ -134,6 +135,7 @@ function _ding_availability_text(&$item) {
 
 /**
  * Implements hook_block_info().
+ *
  * Define availability legend block.
  */
 function ding_availability_block_info() {
@@ -147,6 +149,7 @@ function ding_availability_block_info() {
 
 /**
  * Implements hook_block_view().
+ *
  * Define availability legend block.
  */
 function ding_availability_block_view($delta = '') {
@@ -162,19 +165,23 @@ function ding_availability_render_legend() {
 
   drupal_add_css(drupal_get_path('module', 'ding_availability') . '/css/ding_availability_legend.css');
 
-  // construct the image's path (.gif stored in a module subdir)
+  // Construct the image's path (.gif stored in a module subdir).
   $image_path = drupal_get_path('module', 'ding_availability') . '/images/blank.gif';
 
-  // make some text, image's alt & title tags (SEO, accessibility)
+  // Make some text, image's alt & title tags (SEO, accessibility).
   $availability_legend['available']     = t('Available');
   $availability_legend['on-loan']       = t('On loan');
   $availability_legend['unavailable']   = t('Unavailable');
   $availability_legend['unreservable']   = t('Not reservable');
 
-  // render image html using theme_image (returns NULL if file doesn't exist)
+  // Render image html using theme_image (returns NULL if file doesn't exist).
   foreach ($availability_legend as $key => $val) {
     $format_label = '<span class="availability-label">' . $val . '</span>';
-    $format_image = theme('image', array('path' => $image_path, 'alt' => $val, 'title' => $val));
+    $format_image = theme('image', array(
+      'path' => $image_path,
+      'alt' => $val,
+      'title' => $val,
+    ));
     $format_items[] = '<div class="availability-legend-item ' . $key . '">' . $format_image . $format_label . '</div>';
   }
   $format_items[] = '<div class="clearfix"></div>';
@@ -184,7 +191,7 @@ function ding_availability_render_legend() {
 }
 
 /**
- * ting_object_entities preprocessor.
+ * Preprocessor for ting_object_entities.
  */
 function ding_availability_preprocess_ting_object_entities(&$variables) {
   if (!empty($variables['content']) && function_exists('ding_availability_render_legend')) {
@@ -198,7 +205,7 @@ function ding_availability_preprocess_ting_object_entities(&$variables) {
 /**
  * Implements hook_ding_availability_ajax().
  */
-function ding_availability_ajax($objects, $prefix = null, $settings = array()) {
+function ding_availability_ajax($objects, $prefix = NULL, $settings = array()) {
   $data = $ids = array();
 
   if ($prefix) {
