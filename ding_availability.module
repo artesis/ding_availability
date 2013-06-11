@@ -220,3 +220,27 @@ function ding_availability_ajax($objects, $prefix = null, $settings = array()) {
 
   return $ids;
 }
+
+/**
+ * Implements hook_ding_entity_buttons().
+ */
+function ding_availability_ding_entity_buttons($type, $entity) {
+  return array(
+    array(
+      '#theme' => 'link',
+      '#text' => '<i class="icon-white"></i>' . t('Find it here'),
+      '#path' => '#',
+      '#options' => array(
+        'attributes' => array(
+          'class' => array(
+            'btn',
+            'btn-artesis-turquoise',
+            'find-it-here',
+          ),
+          'name' => t('Holdings/issues'),
+        ),
+        'html' => TRUE,
+      ),
+    ),
+  );
+}
