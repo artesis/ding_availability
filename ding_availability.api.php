@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Hooks provided by the Ding Availability module.
@@ -13,16 +12,17 @@
 /**
  * Add ajax handler to check availability.
  *
- * @param $objects
+ * @param array $objects
  *   Ting object list.
- * @param $prefix
+ * @param string $prefix
  *   Prefix to generated id. Used in HTML markup.
- * @param $settings
- *   Additional settings or settings to replace generated inside of this function.
- * @return $ids
+ * @param array $settings
+ *   Additional settings to replace generated inside of this function.
+ *
+ * @return array
  *   Returns generated IDs.
  */
-function hook_ding_availability_ajax($objects, $prefix = null, $settings = array()) {
+function hook_ding_availability_ajax($objects, $prefix = NULL, $settings = array()) {
 
 }
 
