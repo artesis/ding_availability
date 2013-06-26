@@ -231,12 +231,14 @@ function ding_availability_ajax($objects, $prefix = NULL, $settings = array()) {
 /**
  * Implements hook_ding_entity_buttons().
  */
-function ding_availability_ding_entity_buttons($type, $entity) {
+function ding_availability_ding_entity_buttons($type, $entity, $newsearch = false) {
+  $options = array('absolute' => true);
+  $url = url('search/ting/' . $entity->getLocalId(), $options);
   return array(
     array(
       '#theme' => 'link',
       '#text' => '<i class="icon-white"></i>' . t('Find it here'),
-      '#path' => '#',
+      '#path' => $newsearch ? $url : '#',
       '#options' => array(
         'attributes' => array(
           'class' => array(
