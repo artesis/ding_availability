@@ -237,7 +237,7 @@ function ding_availability_ding_entity_buttons($type, $entity, $newsearch = fals
   return array(
     array(
       '#theme' => 'link',
-      '#text' => '<i class="icon-white"></i>' . t('Find it here'),
+      '#text' => '<i class="icon-map-marker icon-white"></i> ' . t('Find it here'),
       '#path' => $newsearch ? $url : '#',
       '#options' => array(
         'attributes' => array(
@@ -250,6 +250,7 @@ function ding_availability_ding_entity_buttons($type, $entity, $newsearch = fals
         ),
         'html' => TRUE,
       ),
+      '#weight' => -100,
     ),
   );
 }
