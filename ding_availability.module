@@ -53,7 +53,8 @@ function ding_availability_js($provider_ids) {
  * Ajax handler for holdings.
  */
 function ding_availability_holdings_js($provider_ids) {
-  drupal_json_output(ding_availability_holdings(explode(',', $provider_ids)));
+  $result = ding_availability_holdings(explode(',', $provider_ids));
+  drupal_json_output($result);
 }
 
 /**
@@ -84,6 +85,12 @@ function ding_availability_items($provider_ids) {
  */
 function ding_availability_holdings($provider_ids) {
   $items = ding_provider_invoke('availability', 'holdings', $provider_ids);
+  // Catch "authentication_error".
+  // @todo Move this check to client.
+  if (is_string($items)) {
+    return array('error' => $items);
+  }
+
   if (!$items) {
     return array();
   }
