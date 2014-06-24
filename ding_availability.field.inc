@@ -33,7 +33,7 @@ function ding_availability_field_info() {
 function ding_availability_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
   foreach ($entities as $id => $entity) {
     $items[$id][0] = array(
-      'provider_id' => $entity->localId,
+      'provider_id' => $entity->getLocalId(),
     );
   }
 }
@@ -85,53 +85,28 @@ function ding_availability_field_formatter_view($entity_type, $entity, $field, $
       case 'ding_availability_holdings':
         $ids = module_invoke('ding_availability', 'ajax', array($entity), 'holdings', array('ding_availability_mode' => 'holdings'));
         $element[$delta] = array(
-          '#markup' => ($entity->type !== 'Tidsskrift') ? '<div id="' . current($ids) . '" class="holdings holdings-' . $entity->localId . '"></div>' : '',
+          '#markup' => ($entity->getType() !== 'Tidsskrift') ? '<div id="' . current($ids) . '" class="holdings holdings-' . $entity->getLocalId() . '"></div>' : '',
         );
         break;
+
       case 'ding_availability_item':
         module_invoke('ding_availability', 'ajax', array($entity));
         $element[$delta] = array(
           '#markup' => '<div class="availability availability-' . $item['provider_id'] . '"></div>',
         );
         break;
+
       case 'ting_type':
         $ids = module_invoke('ding_availability', 'ajax', array($entity), 'availability');
         $element[$delta] = array(
           '#theme' => 'item_list',
           '#items' => array(
             array(
-              'data' => $entity->type,
+              'data' => $entity->getType(),
               'id' => current($ids),
-              'class' => array('availability', drupal_html_class($entity->type)),
+              'class' => array('availability', drupal_html_class($entity->getType())),
             ),
           ),
-        );
-        break;
-      case 'ting_collection_types':
-        $id_mapping = array();
-        $typed_entities = array();
-        // Sort entities into type -> ids.
-        foreach ($entity->entities as $ent) {
-          $typed_entities[$ent->type][] = $ent->localId;
-        }
-
-        foreach ($typed_entities as $type => $entities) {
-          // Generate an unique id.
-          $id = drupal_html_id('availability-' . $entity->id . '-' . $type);
-          // Create a list element for each type.
-          $types[] = array(
-            'data' => $type,
-            'id' => $id,
-            'class' => array('availability', drupal_html_class($type)),
-          );
-          // Map the HTML id to the list of entity ids.
-          $id_mapping[$id] = $entities;
-        }
-
-        module_invoke('ding_availability', 'ajax', array($entity), 'availability', array('ding_availability' => $id_mapping));
-        $element[$delta] = array(
-          '#theme' => 'item_list',
-          '#items' => $types,
         );
         break;
     }

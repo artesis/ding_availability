@@ -55,6 +55,9 @@
             updateHoldings(id, entity_ids);
           }
         });
+
+        // Trigger custom event, to able external modules bind on it.
+        $(document).trigger("materials_status", [data]);
       }
 
       function updateAvailability(id, status) {
