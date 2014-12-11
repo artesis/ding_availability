@@ -44,15 +44,15 @@
         });
 
         $.each(settings.ding_availability, function(id, entity_ids) {
+          var status = ding_status(entity_ids);
           if (id.match(/^availability-/)) {
-            var status = ding_status(entity_ids);
             // Update availability indicators.
             updateAvailability(id, status);
             updateReservation('reservation-' + entity_ids[0], status);
           }
           else {
             // Update holding information.
-            updateHoldings(id, entity_ids);
+            updateHoldings(id, entity_ids, status);
           }
         });
 
@@ -91,7 +91,7 @@
         }
       }
 
-      function updateHoldings(id, entity_ids) {
+      function updateHoldings(id, entity_ids, status) {
         var entity_id = entity_ids.pop();
         if (Drupal.DADB[entity_id] && (Drupal.DADB[entity_id]['holdings'] || Drupal.DADB[entity_id]['holdings_available'])) {
           var holdings;
@@ -122,7 +122,8 @@
           // show status for material if total_count is more than zero and html is given.
           if (Drupal.DADB[entity_id].html && Drupal.DADB[entity_id].total_count > 0) {
             $('#' + id).append('<h2>' + Drupal.t('Status for the material') + '</h2>');
-            $('#' + id).append(Drupal.DADB[entity_id].html) ;
+            $('#' + id).append(Drupal.DADB[entity_id].html);
+            updateAvailability(id, status);
           }
           // if no html is given; this is exceptional situation.
           else if (length > 0) {
