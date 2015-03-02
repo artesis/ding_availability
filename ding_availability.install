@@ -23,4 +23,3 @@ function ding_availability_ding_entity_fields() {
     ),
   );
 }
-
