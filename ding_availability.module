@@ -258,7 +258,7 @@ function ding_availability_ding_entity_buttons($type, $entity, $newsearch = fals
         ),
         'html' => TRUE,
       ),
-      '#weight' => -100,
+      '#weight' => 105,
     ),
   );
 }
