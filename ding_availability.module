@@ -94,8 +94,42 @@ function ding_availability_holdings($provider_ids) {
   if (!$items) {
     return array();
   }
-  $agency = variable_get('ting_agency', '');
-  // Get array of reserveable types defined in backend.
+
+  $search_query = array();
+  foreach ($items as $item) {
+    $search_query[] = $item['local_id'];
+  }
+  $search_query = '(' . implode(' OR ', $search_query) . ')';
+
+  // Search for items in search result to use their types below.
+  //
+  // First reason for making a search instead of querying a specific object
+  // is for speed reasons. It's much faster to get needed data for a set
+  // of items, instead of querying each item consequently.
+  // Second, the getObject method for the latest versions of OpenSearch,
+  // accepts only id's in form - 870970-basis:28540167. At the current position
+  // there is no information about '-basis' without making a new search request.
+  //
+  // Using in search request 'rec.id=X' in cql fails as well, due to the fact
+  // that OpenSearch does not allow having 'holdingsitem.agencyid' and
+  // rec.id parameters in same query.
+  // See ting.client.inc, line 433.
+  //
+  // Theoretically, it might be possible to set the
+  // 'ting_filter_by_local_holdings' variable as FALSE, to allow 'rec.id'
+  // in cql, yet this might mess with search results for users that would
+  // search something in the same moment.
+  $entities = [];
+  /** @var \TingSearchResult $search_result */
+  if ($search_result = ting_do_search($search_query, 1, 50)) {
+    /** @var \TingEntity $ting_entity */
+    while ($ting_entity = $search_result->current()) {
+      $entities[$ting_entity->getLocalId()] = $ting_entity;
+      $search_result->next();
+    }
+  }
+
+  // Get array of reservable types defined in backend.
   $reservable_types = variable_get('ting_reservable_types', _ting_default_reservable_types());
   foreach ($items as &$item) {
     $item += array(
@@ -103,16 +137,11 @@ function ding_availability_holdings($provider_ids) {
       'available' => FALSE,
       'holdings' => array(),
     );
-    try {
-      // Fetch object from Ting, only needed to get its type.
-      $entity = ting_get_object_request($agency . ':' . $item['local_id']);
-      // If this type is not marked as available for reservation hide button.
-      if ($entity != NULL && !in_array(mb_strtolower($entity->getType()), $reservable_types)) {
-        $item['show_reservation_button'] = FALSE;
-      }
-    }
-    catch(Exception $e) {
-      // Keep 'show_reservation_button' as default from provider  FALSE.
+
+    // Whether the item is not searchable (we need the item type)
+    // or the type is not set as reservable, hide the reservation button.
+    if (!isset($entities[$item['local_id']]) || !in_array(mb_strtolower($entities[$item['local_id']]->getType()), $reservable_types)) {
+      $item['show_reservation_button'] = FALSE;
     }
 
     _ding_availability_text($item);
